@@ -6,9 +6,8 @@ import pandas as pd
 conn = sqlite3.connect('/tmp/registro_ocupacao.sql')
 cur = conn.cursor()
 
-cur.execute('DROP TABLE IF EXISTS registro_ocupacao')
-cur.execute('''
-    CREATE TABLE "registro_ocupacao" (
+cur.executescript('''
+    CREATE TABLE IF NOT EXISTS registro_ocupacao (
         "_id"  TEXT,
         "dataNotificacao" TEXT,
         "cnes" REAL,
@@ -33,13 +32,11 @@ cur.execute('''
     )
     ''')
 
-f = input()
-if len(f) < 1 : f = "RegistroOcupacao.csv"
+f = input('test.csv')
 
 with open(f) as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
-        print(row)
         _id=row[0]
         dataNotificacao=row[1]
         cnes=row[2]
@@ -62,7 +59,7 @@ with open(f) as csv_file:
         _created_at=row[19]
         _updated_at=row[20]
         
-        cur.execute('''
+        cur.executescript('''
         INSERT INTO registro_ocupacao(_id,dataNotificacao,cnes,ocupacaoSuspeitoCli,ocupacaoSuspeitoUti,ocupacaoConfirmadoCli,ocupacaoConfirmadoUti,saidaSuspeitaObitos,saidaSuspeitaAltas,saidaConfirmadaObitos,saidaConfirmadaAltas,origem,_p_usuario,estadoNotificacao,municipioNotificacao,estado,municipio,excluido,validado,_created_at,_updated_at)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         ''', (_id,dataNotificacao,cnes,ocupacaoSuspeitoCli,ocupacaoSuspeitoUti,ocupacaoConfirmadoCli,ocupacaoConfirmadoUti,saidaSuspeitaObitos,saidaSuspeitaAltas,saidaConfirmadaObitos,saidaConfirmadaAltas,origem,_p_usuario,estadoNotificacao,municipioNotificacao,estado,municipio,excluido,validado,_created_at,_updated_at))
