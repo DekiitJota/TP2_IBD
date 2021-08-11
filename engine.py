@@ -6,31 +6,33 @@ import pandas as pd
 conn = sqlite3.connect('/tmp/registro_ocupacao.sql')
 cur = conn.cursor()
 
-cur.executescript('''
+conn.executescript('''
+    PRAGMA foreign_keys=OFF;
+    BEGIN TRANSACTION;
     CREATE TABLE IF NOT EXISTS registro_ocupacao (
-        "_id"  TEXT,
-        "dataNotificacao" TEXT,
-        "cnes" REAL,
-        "ocupacaoSuspeitoCli" REAL,
-        "ocupacaoSuspeitoUti" INTEGER,
-        "ocupacaoConfirmadoCli" INTEGER,
-        "ocupacaoConfirmadoUti" INTEGER,
-        "saidaSuspeitaObitos" INTEGER,
-        "saidaSuspeitaAltas" INTEGER,
-        "saidaConfirmadaObitos" INTEGER,
-        "saidaConfirmadaAltas" INTEGER,
-        "origem" TEXT,
-        "_p_usuario" TEXT,
-        "estadoNotificacao" TEXT,
-        "municipioNotificacao" TEXT,
-        "estado" TEXT,
-        "municipio" TEXT,
-        "excluido" TEXT,
-        "validado" TEXT,
-        "_created_at" TEXT,
-        "_updated_at" TEXT
-    )
-    ''')
+        "_id"                   TEXT, 
+        "dataNotificacao"      DATE,
+        "cnes"			REAL, 
+        "ocupacaoSuspeitoCli"	INTEGER, 
+        "ocupacaoSuspeitoUti"   INTEGER, 
+        "ocupacaoConfirmadoCli" INTEGER, 
+        "ocupacaoConfirmadoUti" INTEGER, 
+        "saidaSuspeitaObitos"   INTEGER, 
+        "saidaSuspeitaAltas"    INTEGER, 
+        "saidaConfirmadaObitos" INTEGER, 
+        "saidaConfirmadaAltas"  INTEGER, 
+        "origem"               	TEXT, 
+        "_p_usuario"            TEXT, 
+        "estadoNotificacao"     TEXT, 
+        "municipioNotificacao"  TEXT, 
+        "estado"                TEXT, 
+        "municipio"             TEXT, 
+        "excluido"              INTEGER, 
+        "validado"              INTEGER, 
+        "_created_at"           DATE, 
+        "_updated_at"          	DATE
+    );
+''')
 
 f = input('test.csv')
 
