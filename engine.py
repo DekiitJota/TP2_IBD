@@ -34,9 +34,7 @@ conn.executescript('''
     );
 ''')
 
-f = input('test.csv')
-
-with open(f) as csv_file:
+with open('/tmp/esus-vepi.LeitoOcupacao.csv', 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
         _id=row[0]
