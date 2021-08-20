@@ -11,8 +11,8 @@ conn.executescript('''
     BEGIN TRANSACTION;
     CREATE TABLE IF NOT EXISTS registro_ocupacao (
         "_id"                   TEXT, 
-        "dataNotificacao"      DATE,
-        "cnes"			REAL, 
+        "dataNotificacao"       DATE,
+        "cnes"			        REAL, 
         "ocupacaoSuspeitoCli"	INTEGER, 
         "ocupacaoSuspeitoUti"   INTEGER, 
         "ocupacaoConfirmadoCli" INTEGER, 
