@@ -3,34 +3,22 @@ import sqlite3
 import csv
 import pandas as pd
 
-conn = sqlite3.connect('/tmp/registro_ocupacao.sql')
+conn = sqlite3.connect('/tmp/preco_medicamentos.sql')
 cur = conn.cursor()
 
 conn.executescript('''
     PRAGMA foreign_keys=OFF;
     BEGIN TRANSACTION;
-    CREATE TABLE IF NOT EXISTS registro_ocupacao (
-        "_id"                   TEXT, 
-        "dataNotificacao"       DATE,
-        "cnes"			        REAL, 
-        "ocupacaoSuspeitoCli"	INTEGER, 
-        "ocupacaoSuspeitoUti"   INTEGER, 
-        "ocupacaoConfirmadoCli" INTEGER, 
-        "ocupacaoConfirmadoUti" INTEGER, 
-        "saidaSuspeitaObitos"   INTEGER, 
-        "saidaSuspeitaAltas"    INTEGER, 
-        "saidaConfirmadaObitos" INTEGER, 
-        "saidaConfirmadaAltas"  INTEGER, 
-        "origem"               	TEXT, 
-        "_p_usuario"            TEXT, 
-        "estadoNotificacao"     TEXT, 
-        "municipioNotificacao"  TEXT, 
-        "estado"                TEXT, 
-        "municipio"             TEXT, 
-        "excluido"              INTEGER, 
-        "validado"              INTEGER, 
-        "_created_at"           DATE, 
-        "_updated_at"          	DATE
+    CREATE TABLE IF NOT EXISTS PRODUTO (
+        "ID_PRODUTO"            INTEGER, 
+        "NOME"       		DATE,
+        "CLASSE"		REAL, 
+        "ocupacaoSuspeitoCli"	INTEGER
+    );
+    CREATE TABLE IF NOT EXISTS SUBSTANCIA(
+	"ID_SUBSTANCIA"		TEXT,
+	"NOME"			TEXT,
+	""			
     );
 ''')
 
