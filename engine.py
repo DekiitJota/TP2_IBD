@@ -9,20 +9,41 @@ cur = conn.cursor()
 conn.executescript('''
     PRAGMA foreign_keys=OFF;
     BEGIN TRANSACTION;
-    CREATE TABLE IF NOT EXISTS PRODUTO (
-        "ID_PRODUTO"            INTEGER, 
-        "NOME"       		DATE,
-        "CLASSE"		REAL, 
-        "ocupacaoSuspeitoCli"	INTEGER
+    CREATE TABLE PRODUTO (
+        ID_PRODUTO INTEGER PRIMARY KEY, 
+        NOME TEXT,
+        CLASSE TEXT
+        ID_REG INTEGER REFERENCES REGISTRO (ID_REG)
     );
-    CREATE TABLE IF NOT EXISTS SUBSTANCIA(
-	"ID_SUBSTANCIA"		TEXT,
-	"NOME"			TEXT,
-	""			
+    CREATE TABLE REGISTRO (
+        ID_REG INTEGER PRIMARY KEY,
+        EAN1 VARCHAR,
+        PRECO_MAXIMO NUMERIC,
+        COD_REGISTRO INTEGER
+    );
+    CREATE TABLE LABORATORIO (
+        ID_LAB INTEGER PRIMARY KEY,
+        NOME_LAB VARCHAR,
+        CNPJ VARCHAR,
+        ID_REG INTEGER REFERENCES REGISTRO (ID_REG)
+    );
+    CREATE TABLE SUBSTANCIA (
+        ID_SUBSTANCIA TEXT,
+        NOME TEXT			
+    ); 
+    CREATE TABLE APRESENTACAO (
+        ID_APRESENTACAO INTEGER PRIMARY KEY,
+        DESCRICAO TEXT,
+        COD_GGREM INTEGER
+    );
+    CREATE TABLE APRESENTACAO (
+        ID_TIPO INTEGER,
+        NOME TEXT,
+        PRIMARY KEY(ID_TIPO)
     );
 ''')
 
-with open('/tmp/esus-vepi.LeitoOcupacao.csv', 'r') as csv_file:
+with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
         _id=row[0]
