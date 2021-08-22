@@ -61,7 +61,7 @@ with open('test2.csv', 'r') as csv_file:
         ean1=row[5]
         ean2=row[6]
         ean3=row[7]
-        nome_produto=row[8]
+        produto=row[8]
         descricao=row[9]
         classe=row[10]
         status=row[11]
@@ -106,7 +106,7 @@ id_tipo = str(uuid.uuid4()).replace('-','')
 cur.executescript('''
     INSERT INTO PRODUTO(ID_PRODUTO,NOME,CLASSE,TARJA,ID_REG,ID_SUBSTANCIA,ID_APRESENTACAO,ID_TIPO)
         VALUES (?,?,?,?,?,?,?,?)
-'''), (id_produto,nome_produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo)
+'''), (id_produto,produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo)
 
 cur.executescript('''
     INSERT INTO REGISTRO(ID_REG,EAN1,PRECO_MAXIMO,COD_REGISTRO)
