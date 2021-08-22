@@ -103,34 +103,34 @@ id_substancia = str(uuid.uuid4()).replace('-','')
 id_apresentacao = str(uuid.uuid4()).replace('-','')
 id_tipo = str(uuid.uuid4()).replace('-','')
 
-cur.executescript('''
+conn.executescript('''
     INSERT INTO PRODUTO(ID_PRODUTO,NOME,CLASSE,TARJA,ID_REG,ID_SUBSTANCIA,ID_APRESENTACAO,ID_TIPO)
-        VALUES (?,?,?,?,?,?,?,?)
+        VALUES (?,?,?,?,?,?,?,?);
 '''), (id_produto,produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo)
 
-cur.executescript('''
+conn.executescript('''
     INSERT INTO REGISTRO(ID_REG,EAN1,PRECO_MAXIMO,COD_REGISTRO)
-        VALUES (?,?,?,?)
+        VALUES (?,?,?,?);
 '''), (id_reg,ean1,preco_mc_20pc,registro)
 
-cur.executescript('''
+conn.executescript('''
     INSERT INTO LABORATORIO(ID_LAB,NOME_LAB,CNPJ,ID_REG) 
-        VALUES (?,?,?,?)
+        VALUES (?,?,?,?);
 '''), (id_lab,laboratorio,cnpj,id_reg)
 
-cur.executescript('''
-    INSERT INTO SUBSTANCIA(ID_SUBSTANCIA,NOME) 
-        VALUES (?,?)
+conn.executescript('''
+    INSERT INTO SUBSTANCIA(ID_SUBSTANCIA,NOME_SUBS) 
+        VALUES (?,?);
 '''), (id_substancia,substancia)
 
-cur.executescript('''
+conn.executescript('''
     INSERT INTO APRESENTACAO(ID_APRESENTACAO,DESCRICAO, COD_GGREM) 
-        VALUES (?,?,?)
+        VALUES (?,?,?);
 '''), (id_apresentacao,descricao,codigo_ggrem)
 
-cur.executescript('''
+conn.executescript('''
     INSERT INTO TIPO(ID_TIPO,STATUS) 
-        VALUES (?,?)
+        VALUES (?,?);
 '''), (id_tipo,status)
 
 conn.commit()
