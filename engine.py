@@ -1,6 +1,7 @@
 import io
 import sqlite3
 import csv
+import uuid
 import pandas as pd
 
 conn = sqlite3.connect('/tmp/preco_medicamentos.sql')
@@ -33,7 +34,7 @@ conn.executescript('''
     );
     CREATE TABLE IF NOT EXISTS SUBSTANCIA (
         ID_SUBSTANCIA INTEGER PRIMARY KEY,
-        NOME TEXT			
+        NOME_SUBS TEXT			
     ); 
     CREATE TABLE IF NOT EXISTS APRESENTACAO (
         ID_APRESENTACAO INTEGER PRIMARY KEY,
@@ -93,36 +94,54 @@ with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
         comercializacao=row[38]
         tarja=row[39]
 
-#TO DO: Implementar identadores para SUBSTANCIA, REGISTRO, LABORATORIO, SUBSTANCIA, APRESENTACAO, TIPO
+id_produto = str(uuid.uuid4()).replace('-','')
+id_reg = str(uuid.uuid4()).replace('-','')
+id_lab = str(uuid.uuid4()).replace('-','')
+id_substancia = str(uuid.uuid4()).replace('-','')
+id_apresentacao = str(uuid.uuid4()).replace('-','')
+id_tipo = str(uuid.uuid4()).replace('-','')
+
 
 cur.executescript('''
-    INSERT INTO PRODUTO(ID_PRODUTO,NOME,CLASSE,TARJA,ID_REG,ID_SUBSTANCIA,ID_APRESENTACAO,ID_TIPO)
-        VALUES (?,?,?,?,?,?,?,?)
-'''), (id_produto,produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo)
+    BEGIN TRANSACTION;
+    INSERT INTO PRODUTO VALUES (?,?,?,?,?,?,?,?);
+    COMMIT;
+'''), (id_produto, produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo)
+
+#TO DO: rever "PRECO_MAXIMO"
+cur.executescript('''
+    BEGIN TRANSACTION;
+    INSERT INTO REGISTRO(ID_REG,EAN1,PRECO_MAXIMO,COD_REGISTRO) 
+        VALUES (?,?,?,?);
+    COMMIT;
+'''), (id_reg,ean1,preco_mc_20pc,registro)
 
 cur.executescript('''
-    INSERT INTO REGISTRO(ID_REG,EAN1,PRECO_MAXIMO,REGISTRO,ID_LAB) 
-        VALUES (?,?,?,?,?)
-'''), (id_reg,ean1,preco_mc_20pc,registro,id_lab)
-
-cur.executescript('''
+    BEGIN TRANSACTION;
     INSERT INTO LABORATORIO(ID_LAB,NOME_LAB,CNPJ,ID_REG) 
-        VALUES (?,?,?,?)
+        VALUES (?,?,?,?);
+    COMMIT;
 '''), (id_lab,laboratorio,cnpj,id_reg)
 
 cur.executescript('''
+    BEGIN TRANSACTION;
     INSERT INTO SUBSTANCIA(ID_SUBSTANCIA,NOME_SUBS) 
-        VALUES (?,?)
+        VALUES (?,?);
+    COMMIT;
 '''), (id_substancia,substancia)
 
 cur.executescript('''
+    BEGIN TRANSACTION;
     INSERT INTO APRESENTACAO(ID_APRESENTACAO,DESCRICAO, COD_GGREM) 
-        VALUES (?,?,?)
+        VALUES (?,?,?);
+    COMMIT;
 '''), (id_apresentacao,descricao,codigo_ggrem)
 
 cur.executescript('''
+    BEGIN TRANSACTION;
     INSERT INTO TIPO(ID_TIPO,STATUS) 
-        VALUES (?,?)
-'''), (id_tarja,status)
+        VALUES (?,?);
+    COMMIT;
+'''), (id_tipo,status)
 
 conn.commit()
