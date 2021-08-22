@@ -1,10 +1,11 @@
+#-*- coding: utf-8 -*-
+
 import io
 import sqlite3
-import csv
 import uuid
-import pandas as pd
+import csv
 
-conn = sqlite3.connect('/tmp/preco_medicamentos.sql')
+conn = sqlite3.connect('preco_medicamentos.sql')
 cur = conn.cursor()
 
 conn.executescript('''
@@ -34,7 +35,7 @@ conn.executescript('''
     );
     CREATE TABLE IF NOT EXISTS SUBSTANCIA (
         ID_SUBSTANCIA INTEGER PRIMARY KEY,
-        NOME_SUBS TEXT			
+	NOME TEXT
     ); 
     CREATE TABLE IF NOT EXISTS APRESENTACAO (
         ID_APRESENTACAO INTEGER PRIMARY KEY,
@@ -48,7 +49,8 @@ conn.executescript('''
     COMMIT;
 ''')
 
-with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
+with open('test2.csv', 'r') as csv_file:
+    contents = csv_file.read().decode("UTF-8")
     csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
         substancia=row[0]
@@ -59,7 +61,7 @@ with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
         ean1=row[5]
         ean2=row[6]
         ean3=row[7]
-        produto=row[8]
+        nome_produto=row[8]
         descricao=row[9]
         classe=row[10]
         status=row[11]
@@ -101,47 +103,34 @@ id_substancia = str(uuid.uuid4()).replace('-','')
 id_apresentacao = str(uuid.uuid4()).replace('-','')
 id_tipo = str(uuid.uuid4()).replace('-','')
 
+cur.executescript('''
+    INSERT INTO PRODUTO(ID_PRODUTO,NOME,CLASSE,TARJA,ID_REG,ID_SUBSTANCIA,ID_APRESENTACAO,ID_TIPO)
+        VALUES (?,?,?,?,?,?,?,?)
+'''), (id_produto,nome_produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo)
 
 cur.executescript('''
-    BEGIN TRANSACTION;
-    INSERT INTO PRODUTO VALUES (?,?,?,?,?,?,?,?);
-    COMMIT;
-'''), (id_produto, produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo)
-
-#TO DO: rever "PRECO_MAXIMO"
-cur.executescript('''
-    BEGIN TRANSACTION;
-    INSERT INTO REGISTRO(ID_REG,EAN1,PRECO_MAXIMO,COD_REGISTRO) 
-        VALUES (?,?,?,?);
-    COMMIT;
+    INSERT INTO REGISTRO(ID_REG,EAN1,PRECO_MAXIMO,COD_REGISTRO)
+        VALUES (?,?,?,?)
 '''), (id_reg,ean1,preco_mc_20pc,registro)
 
 cur.executescript('''
-    BEGIN TRANSACTION;
     INSERT INTO LABORATORIO(ID_LAB,NOME_LAB,CNPJ,ID_REG) 
-        VALUES (?,?,?,?);
-    COMMIT;
+        VALUES (?,?,?,?)
 '''), (id_lab,laboratorio,cnpj,id_reg)
 
 cur.executescript('''
-    BEGIN TRANSACTION;
-    INSERT INTO SUBSTANCIA(ID_SUBSTANCIA,NOME_SUBS) 
-        VALUES (?,?);
-    COMMIT;
+    INSERT INTO SUBSTANCIA(ID_SUBSTANCIA,NOME) 
+        VALUES (?,?)
 '''), (id_substancia,substancia)
 
 cur.executescript('''
-    BEGIN TRANSACTION;
     INSERT INTO APRESENTACAO(ID_APRESENTACAO,DESCRICAO, COD_GGREM) 
-        VALUES (?,?,?);
-    COMMIT;
+        VALUES (?,?,?)
 '''), (id_apresentacao,descricao,codigo_ggrem)
 
 cur.executescript('''
-    BEGIN TRANSACTION;
     INSERT INTO TIPO(ID_TIPO,STATUS) 
-        VALUES (?,?);
-    COMMIT;
+        VALUES (?,?)
 '''), (id_tipo,status)
 
 conn.commit()
