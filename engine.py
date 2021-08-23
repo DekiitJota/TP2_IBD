@@ -6,17 +6,21 @@ conn = sqlite3.connect('/tmp/preco_medicamentos.sql')
 cur = conn.cursor()
 
 conn.executescript('''
-    PRAGMA foreign_keys=OFF;
+    PRAGMA foreign_keys=ON;
     BEGIN TRANSACTION;
     CREATE TABLE IF NOT EXISTS PRODUTO (
         ID_PRODUTO INTEGER PRIMARY KEY, 
         NOME TEXT,
         CLASSE TEXT,
         TARJA TEXT,
-        ID_REG INTEGER REFERENCES REGISTRO (ID_REG),
-        ID_SUBSTANCIA INTEGER REFERENCES SUBSTANCIA (ID_SUBSTANCIA),
-        ID_APRESENTACAO INTEGER REFERENCES APRESENTACAO (ID_APRESENTACAO),
-        ID_TIPO INTEGER REFERENCES TIPO (ID_TIPO)
+        ID_REG INTEGER,
+          FOREIGN KEY (ID_REG) REFERENCES REGISTRO (ID_REG),
+        ID_SUBSTANCIA INTEGER,
+          FOREIGN KEY (ID_SUBSTANCIA) REFERENCES SUBSTANCIA (ID_SUBSTANCIA),
+        ID_APRESENTACAO INTEGER,
+          FOREIGN KEY (ID_APRESENTACAO) REFERENCES APRESENTACAO (ID_APRESENTACAO),
+        ID_TIPO INTEGER,
+          FOREIGN KEY (ID_TIPO) REFERENCES TIPO (ID_TIPO)
     );
     CREATE TABLE IF NOT EXISTS REGISTRO (
         ID_REG INTEGER PRIMARY KEY,
@@ -28,7 +32,8 @@ conn.executescript('''
         ID_LAB INTEGER PRIMARY KEY,
         NOME_LAB TEXT,
         CNPJ TEXT,
-        ID_REG INTEGER REFERENCES REGISTRO (ID_REG)
+        ID_REG INTEGER,
+          FOREIGN KEY (ID_REG) REFERENCES REGISTRO (ID_REG)
     );
     CREATE TABLE IF NOT EXISTS SUBSTANCIA (
         ID_SUBSTANCIA INTEGER PRIMARY KEY,
@@ -49,6 +54,7 @@ conn.executescript('''
 with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
+        print(row) #remove
         substancia=row[0]
         cnpj=row[1]
         laboratorio=row[2]
@@ -92,17 +98,28 @@ with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
         comercializacao=row[38]
         tarja=row[39]
 
-conn.execute("INSERT INTO PRODUTO(NOME,CLASSE,TARJA,ID_REG,ID_SUBSTANCIA,ID_APRESENTACAO,ID_TIPO) VALUES (?,?,?,?,?,?,?)", (produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo))
+def insert_produto(produto):
+    with conn:
+        conn.execute("INSERT INTO PRODUTO(NOME,CLASSE,TARJA) VALUES (?,?,?)", (produto,classe,tarja))
 
-#TO-DO Rever PRECO_MAXIMO
-conn.execute("INSERT INTO REGISTRO(EAN1,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?)", (ean1,preco_mc_20pc,registro))
+def insert_registro(registro):
+    with conn:
+        conn.execute("INSERT INTO REGISTRO(EAN1,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?)", (ean1,preco_mc_20pc,registro))
 
-conn.execute("INSERT INTO LABORATORIO(NOME_LAB,CNPJ,ID_REG) VALUES (?,?,?)", (laboratorio,cnpj,id_reg))
+def insert_laboratorio(laboratorio):
+    with conn:
+        conn.execute("INSERT INTO LABORATORIO(NOME_LAB,CNPJ) VALUES (?,?)", (laboratorio,cnpj))
 
-conn.execute("INSERT INTO SUBSTANCIA(NOME_SUBS) VALUES (?)", (substancia,))
+def insert_substancia(substancia):
+    with conn:
+        conn.execute("INSERT INTO SUBSTANCIA(NOME_SUBS) VALUES (?)", (substancia,))
 
-conn.execute("INSERT INTO APRESENTACAO(DESCRICAO, COD_GGREM)VALUES (?,?)", (descricao,codigo_ggrem))
+def insert_apresentacao(apresentacao):
+    with conn:
+        conn.execute("INSERT INTO APRESENTACAO(DESCRICAO, COD_GGREM)VALUES (?,?)", (descricao,codigo_ggrem))
 
-conn.execute("INSERT INTO TIPO(STATUS) VALUES (?)", (status,))
+def insert_tipo(tipo):
+    with conn:
+        conn.execute("INSERT INTO TIPO(STATUS) VALUES (?)", (status,))
 
 conn.commit()
