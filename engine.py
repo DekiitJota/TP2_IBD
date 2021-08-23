@@ -1,11 +1,8 @@
-#-*- coding: utf-8 -*-
-
-import io
 import sqlite3
-import uuid
 import csv
+import pandas as pd
 
-conn = sqlite3.connect('preco_medicamentos.sql')
+conn = sqlite3.connect('/tmp/preco_medicamentos.sql')
 cur = conn.cursor()
 
 conn.executescript('''
@@ -35,7 +32,7 @@ conn.executescript('''
     );
     CREATE TABLE IF NOT EXISTS SUBSTANCIA (
         ID_SUBSTANCIA INTEGER PRIMARY KEY,
-	NOME TEXT
+        NOME_SUBS TEXT			
     ); 
     CREATE TABLE IF NOT EXISTS APRESENTACAO (
         ID_APRESENTACAO INTEGER PRIMARY KEY,
@@ -49,8 +46,7 @@ conn.executescript('''
     COMMIT;
 ''')
 
-with open('test2.csv', 'r') as csv_file:
-    contents = csv_file.read().decode("UTF-8")
+with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
         substancia=row[0]
@@ -96,41 +92,17 @@ with open('test2.csv', 'r') as csv_file:
         comercializacao=row[38]
         tarja=row[39]
 
-id_produto = str(uuid.uuid4()).replace('-','')
-id_reg = str(uuid.uuid4()).replace('-','')
-id_lab = str(uuid.uuid4()).replace('-','')
-id_substancia = str(uuid.uuid4()).replace('-','')
-id_apresentacao = str(uuid.uuid4()).replace('-','')
-id_tipo = str(uuid.uuid4()).replace('-','')
+conn.execute("INSERT INTO PRODUTO(NOME,CLASSE,TARJA,ID_REG,ID_SUBSTANCIA,ID_APRESENTACAO,ID_TIPO) VALUES (?,?,?,?,?,?,?)", (produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo))
 
-conn.executescript('''
-    INSERT INTO PRODUTO(ID_PRODUTO,NOME,CLASSE,TARJA,ID_REG,ID_SUBSTANCIA,ID_APRESENTACAO,ID_TIPO)
-        VALUES (?,?,?,?,?,?,?,?);
-'''), (id_produto,produto,classe,tarja,id_reg,id_substancia,id_apresentacao,id_tipo)
+#TO-DO Rever PRECO_MAXIMO
+conn.execute("INSERT INTO REGISTRO(EAN1,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?)", (ean1,preco_mc_20pc,registro))
 
-conn.executescript('''
-    INSERT INTO REGISTRO(ID_REG,EAN1,PRECO_MAXIMO,COD_REGISTRO)
-        VALUES (?,?,?,?);
-'''), (id_reg,ean1,preco_mc_20pc,registro)
+conn.execute("INSERT INTO LABORATORIO(NOME_LAB,CNPJ,ID_REG) VALUES (?,?,?)", (laboratorio,cnpj,id_reg))
 
-conn.executescript('''
-    INSERT INTO LABORATORIO(ID_LAB,NOME_LAB,CNPJ,ID_REG) 
-        VALUES (?,?,?,?);
-'''), (id_lab,laboratorio,cnpj,id_reg)
+conn.execute("INSERT INTO SUBSTANCIA(NOME_SUBS) VALUES (?)", (substancia,))
 
-conn.executescript('''
-    INSERT INTO SUBSTANCIA(ID_SUBSTANCIA,NOME_SUBS) 
-        VALUES (?,?);
-'''), (id_substancia,substancia)
+conn.execute("INSERT INTO APRESENTACAO(DESCRICAO, COD_GGREM)VALUES (?,?)", (descricao,codigo_ggrem))
 
-conn.executescript('''
-    INSERT INTO APRESENTACAO(ID_APRESENTACAO,DESCRICAO, COD_GGREM) 
-        VALUES (?,?,?);
-'''), (id_apresentacao,descricao,codigo_ggrem)
-
-conn.executescript('''
-    INSERT INTO TIPO(ID_TIPO,STATUS) 
-        VALUES (?,?);
-'''), (id_tipo,status)
+conn.execute("INSERT INTO TIPO(STATUS) VALUES (?)", (status,))
 
 conn.commit()
