@@ -5,7 +5,7 @@ import pandas as pd
 conn = sqlite3.connect('/tmp/preco_medicamentos.sql')
 cur = conn.cursor()
 
-conn.executescript('''
+conn.executescript("""
     PRAGMA foreign_keys=ON;
     BEGIN TRANSACTION;
     CREATE TABLE IF NOT EXISTS PRODUTO (
@@ -14,12 +14,12 @@ conn.executescript('''
         CLASSE TEXT,
         TARJA TEXT,
         ID_REG INTEGER,
-          FOREIGN KEY (ID_REG) REFERENCES REGISTRO (ID_REG),
         ID_SUBSTANCIA INTEGER,
-          FOREIGN KEY (ID_SUBSTANCIA) REFERENCES SUBSTANCIA (ID_SUBSTANCIA),
         ID_APRESENTACAO INTEGER,
-          FOREIGN KEY (ID_APRESENTACAO) REFERENCES APRESENTACAO (ID_APRESENTACAO),
         ID_TIPO INTEGER,
+          FOREIGN KEY (ID_REG) REFERENCES REGISTRO (ID_REG),
+          FOREIGN KEY (ID_SUBSTANCIA) REFERENCES SUBSTANCIA (ID_SUBSTANCIA),
+          FOREIGN KEY (ID_APRESENTACAO) REFERENCES APRESENTACAO (ID_APRESENTACAO),
           FOREIGN KEY (ID_TIPO) REFERENCES TIPO (ID_TIPO)
     );
     CREATE TABLE IF NOT EXISTS REGISTRO (
@@ -49,7 +49,7 @@ conn.executescript('''
         STATUS TEXT
     );
     COMMIT;
-''')
+""")
 
 with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
@@ -104,22 +104,22 @@ def insert_produto(produto):
 
 def insert_registro(registro):
     with conn:
-        conn.execute("INSERT INTO REGISTRO(EAN1,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?)", (ean1,preco_mc_20pc,registro))
+        conn.execute("INSERT INTO REGISTRO(ID_REG,EAN1,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?,?)", (id_reg,ean1,preco_mc_20pc,registro))
 
 def insert_laboratorio(laboratorio):
     with conn:
-        conn.execute("INSERT INTO LABORATORIO(NOME_LAB,CNPJ) VALUES (?,?)", (laboratorio,cnpj))
+        conn.execute("INSERT INTO LABORATORIO(ID_LABORATORIO,NOME_LAB,CNPJ) VALUES (?,?,?)", (id_lab,laboratorio,cnpj))
 
 def insert_substancia(substancia):
     with conn:
-        conn.execute("INSERT INTO SUBSTANCIA(NOME_SUBS) VALUES (?)", (substancia,))
+        conn.execute("INSERT INTO SUBSTANCIA(ID_SUBSTANCIA,NOME_SUBS) VALUES (?,?)", (id_substancia,substancia))
 
 def insert_apresentacao(apresentacao):
     with conn:
-        conn.execute("INSERT INTO APRESENTACAO(DESCRICAO, COD_GGREM)VALUES (?,?)", (descricao,codigo_ggrem))
+        conn.execute("INSERT INTO APRESENTACAO(ID_APRESENTACAO,DESCRICAO,COD_GGREM)VALUES (?,?,?)", (id_apresentacao,descricao,codigo_ggrem))
 
 def insert_tipo(tipo):
     with conn:
-        conn.execute("INSERT INTO TIPO(STATUS) VALUES (?)", (status,))
+        conn.execute("INSERT INTO TIPO(ID_TIPO,STATUS) VALUES (?,?)", (id_tipo,status))
 
 conn.commit()
