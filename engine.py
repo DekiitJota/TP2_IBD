@@ -6,7 +6,7 @@ conn = sqlite3.connect('/tmp/preco_medicamentos.sql')
 cur = conn.cursor()
 
 conn.executescript("""
-    PRAGMA foreign_keys=ON;
+    PRAGMA foreign_keys=OFF;
     BEGIN TRANSACTION;
     CREATE TABLE IF NOT EXISTS PRODUTO (
         ID_PRODUTO INTEGER PRIMARY KEY, 
@@ -54,7 +54,7 @@ conn.executescript("""
 with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
-        print(row) #remove
+        #print(row) #remove
         substancia=row[0]
         cnpj=row[1]
         laboratorio=row[2]
@@ -97,29 +97,17 @@ with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
         cr_tributario=row[37]
         comercializacao=row[38]
         tarja=row[39]
-
-def insert_produto(produto):
-    with conn:
-        conn.execute("INSERT INTO PRODUTO(NOME,CLASSE,TARJA) VALUES (?,?,?)", (produto,classe,tarja))
-
-def insert_registro(registro):
-    with conn:
-        conn.execute("INSERT INTO REGISTRO(ID_REG,EAN1,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?,?)", (id_reg,ean1,preco_mc_20pc,registro))
-
-def insert_laboratorio(laboratorio):
-    with conn:
-        conn.execute("INSERT INTO LABORATORIO(ID_LABORATORIO,NOME_LAB,CNPJ) VALUES (?,?,?)", (id_lab,laboratorio,cnpj))
-
-def insert_substancia(substancia):
-    with conn:
-        conn.execute("INSERT INTO SUBSTANCIA(ID_SUBSTANCIA,NOME_SUBS) VALUES (?,?)", (id_substancia,substancia))
-
-def insert_apresentacao(apresentacao):
-    with conn:
-        conn.execute("INSERT INTO APRESENTACAO(ID_APRESENTACAO,DESCRICAO,COD_GGREM)VALUES (?,?,?)", (id_apresentacao,descricao,codigo_ggrem))
-
-def insert_tipo(tipo):
-    with conn:
-        conn.execute("INSERT INTO TIPO(ID_TIPO,STATUS) VALUES (?,?)", (id_tipo,status))
+        with conn:
+            conn.execute("INSERT INTO PRODUTO(NOME,CLASSE,TARJA) VALUES (?,?,?)", (produto,classe,tarja))
+        with conn:
+            conn.execute("INSERT INTO REGISTRO(EAN1,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?)", (ean1,preco_mc_20pc,registro))
+        with conn:
+            conn.execute("INSERT INTO LABORATORIO(NOME_LAB,CNPJ) VALUES (?,?)", (laboratorio,cnpj))
+        with conn:
+            conn.execute("INSERT INTO SUBSTANCIA(NOME_SUBS) VALUES (?)", (substancia,))
+        with conn:
+            conn.execute("INSERT INTO APRESENTACAO(DESCRICAO,COD_GGREM)VALUES (?,?)", (descricao,codigo_ggrem))
+        with conn:
+            conn.execute("INSERT INTO TIPO(STATUS) VALUES (?)", (status,))
 
 conn.commit()
