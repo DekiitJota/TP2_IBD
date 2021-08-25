@@ -6,34 +6,32 @@ conn = sqlite3.connect('/tmp/preco_medicamentos.sql')
 cur = conn.cursor()
 
 conn.executescript("""
-    PRAGMA foreign_keys=OFF;
+    PRAGMA foreign_keys=ON;
     BEGIN TRANSACTION;
     CREATE TABLE IF NOT EXISTS PRODUTO (
         ID_PRODUTO INTEGER PRIMARY KEY, 
         NOME TEXT,
         CLASSE TEXT,
-        TARJA TEXT,
-        ID_REG INTEGER,
         ID_SUBSTANCIA INTEGER,
-        ID_APRESENTACAO INTEGER,
         ID_TIPO INTEGER,
-          FOREIGN KEY (ID_REG) REFERENCES REGISTRO (ID_REG),
           FOREIGN KEY (ID_SUBSTANCIA) REFERENCES SUBSTANCIA (ID_SUBSTANCIA),
-          FOREIGN KEY (ID_APRESENTACAO) REFERENCES APRESENTACAO (ID_APRESENTACAO),
           FOREIGN KEY (ID_TIPO) REFERENCES TIPO (ID_TIPO)
     );
     CREATE TABLE IF NOT EXISTS REGISTRO (
         ID_REG INTEGER PRIMARY KEY,
         EAN1 TEXT,
+        TARJA TEXT,
         PRECO_MAXIMO NUMERIC,
-        COD_REGISTRO INTEGER
+        COD_REGISTRO INTEGER,
+        ID_LAB INTEGER,
+        ID_PRODUTO INTEGER,
+          FOREIGN KEY (ID_PRODUTO) REFERENCES PRODUTO (ID_PRODUTO),
+          FOREIGN KEY (ID_LAB) REFERENCES LABORATORIO (ID_LAB)
     );
     CREATE TABLE IF NOT EXISTS LABORATORIO (
         ID_LAB INTEGER PRIMARY KEY,
         NOME_LAB TEXT,
         CNPJ TEXT,
-        ID_REG INTEGER,
-          FOREIGN KEY (ID_REG) REFERENCES REGISTRO (ID_REG)
     );
     CREATE TABLE IF NOT EXISTS SUBSTANCIA (
         ID_SUBSTANCIA INTEGER PRIMARY KEY,
@@ -42,7 +40,9 @@ conn.executescript("""
     CREATE TABLE IF NOT EXISTS APRESENTACAO (
         ID_APRESENTACAO INTEGER PRIMARY KEY,
         DESCRICAO TEXT,
-        COD_GGREM INTEGER
+        COD_GGREM INTEGER,
+        ID_PRODUTO INTEGER,
+          FOREIGN KEY (ID_PRODUTO) REFERENCES PRODUTO (ID_PRODUTO)
     );
     CREATE TABLE IF NOT EXISTS TIPO (
         ID_TIPO INTEGER PRIMARY KEY,
@@ -98,9 +98,9 @@ with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
         comercializacao=row[38]
         tarja=row[39]
         with conn:
-            conn.execute("INSERT INTO PRODUTO(NOME,CLASSE,TARJA) VALUES (?,?,?)", (produto,classe,tarja))
+            conn.execute("INSERT INTO PRODUTO(NOME,CLASSE) VALUES (?,?)", (produto,classe))
         with conn:
-            conn.execute("INSERT INTO REGISTRO(EAN1,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?)", (ean1,preco_mc_20pc,registro))
+            conn.execute("INSERT INTO REGISTRO(EAN1,TARJA,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?,?)", (ean1,tarja,preco_mc_20pc,registro))
         with conn:
             conn.execute("INSERT INTO LABORATORIO(NOME_LAB,CNPJ) VALUES (?,?)", (laboratorio,cnpj))
         with conn:
