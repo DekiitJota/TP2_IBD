@@ -107,4 +107,9 @@ with open('/tmp/test2.csv', 'r') as csv_file:
         
         #deleta o header do arquivo csv:
         cur.execute("DELETE FROM PRODUTO WHERE (NOME == 'PRODUTO')")
+        cur.execute("DELETE FROM REGISTRO WHERE (COD_REGISTRO == 'REGISTRO')")
+        cur.execute("DELETE FROM LABORATORIO WHERE (NOME_LAB == 'LABORATORIO')")
+        cur.execute("DELETE FROM SUBSTANCIA WHERE (NOME_SUBS == 'SUBSTANCIA')")
+        cur.execute("DELETE FROM APRESENTACAO WHERE (DESCRICAO == 'APRESENTACAO')")
+        cur.execute("DELETE FROM TIPO WHERE (STATUS == 'TIPO DE PRODUTO (STATUS DO PRODUTO)')")
 conn.commit()
