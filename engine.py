@@ -5,8 +5,8 @@ import pandas as pd
 conn = sqlite3.connect('/tmp/preco_medicamentos.sql')
 cur = conn.cursor()
 
-conn.executescript("""
-    PRAGMA foreign_keys=ON;
+cur.executescript("""
+    PRAGMA foreign_keys=OFF;
     BEGIN TRANSACTION;
     CREATE TABLE IF NOT EXISTS PRODUTO (
         ID_PRODUTO INTEGER PRIMARY KEY, 
@@ -31,7 +31,7 @@ conn.executescript("""
     CREATE TABLE IF NOT EXISTS LABORATORIO (
         ID_LAB INTEGER PRIMARY KEY,
         NOME_LAB TEXT,
-        CNPJ TEXT,
+        CNPJ TEXT
     );
     CREATE TABLE IF NOT EXISTS SUBSTANCIA (
         ID_SUBSTANCIA INTEGER PRIMARY KEY,
@@ -51,7 +51,7 @@ conn.executescript("""
     COMMIT;
 """)
 
-with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
+with open('/tmp/test2.csv', 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
         #print(row) #remove
@@ -98,16 +98,13 @@ with open('/tmp/TA_PRECO_MEDICAMENTO.csv', 'r') as csv_file:
         comercializacao=row[38]
         tarja=row[39]
         with conn:
-            conn.execute("INSERT INTO PRODUTO(NOME,CLASSE) VALUES (?,?)", (produto,classe))
-        with conn:
-            conn.execute("INSERT INTO REGISTRO(EAN1,TARJA,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?,?)", (ean1,tarja,preco_mc_20pc,registro))
-        with conn:
-            conn.execute("INSERT INTO LABORATORIO(NOME_LAB,CNPJ) VALUES (?,?)", (laboratorio,cnpj))
-        with conn:
-            conn.execute("INSERT INTO SUBSTANCIA(NOME_SUBS) VALUES (?)", (substancia,))
-        with conn:
-            conn.execute("INSERT INTO APRESENTACAO(DESCRICAO,COD_GGREM)VALUES (?,?)", (descricao,codigo_ggrem))
-        with conn:
-            conn.execute("INSERT INTO TIPO(STATUS) VALUES (?)", (status,))
-
+            cur.execute("INSERT INTO PRODUTO(NOME,CLASSE) VALUES (?,?)", (produto,classe))
+            cur.execute("INSERT INTO REGISTRO(EAN1,TARJA,PRECO_MAXIMO,COD_REGISTRO) VALUES (?,?,?,?)", (ean1,tarja,preco_mc_20pc,registro))
+            cur.execute("INSERT INTO LABORATORIO(NOME_LAB,CNPJ) VALUES (?,?)", (laboratorio,cnpj))
+            cur.execute("INSERT INTO SUBSTANCIA(NOME_SUBS) VALUES (?)", (substancia,))
+            cur.execute("INSERT INTO APRESENTACAO(DESCRICAO,COD_GGREM)VALUES (?,?)", (descricao,codigo_ggrem))
+            cur.execute("INSERT INTO TIPO(STATUS) VALUES (?)", (status,))
+        
+        #deleta o header do arquivo csv:
+        cur.execute("DELETE FROM PRODUTO WHERE (NOME == 'PRODUTO')")
 conn.commit()
